@@ -4,6 +4,7 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import styled from "styled-components"
 import { Play, ChevronRight, Heart, Clock, Mic2, Plus, Trash2 } from "lucide-react"
+import { toast } from "@/hooks/use-toast"
 import type { Track } from "@/components/music-player/types"
 import { useAudioPlayerContext } from "@/components/music-player/contexts/AudioPlayerContext"
 import { useTracksContext, usePlaylistContext } from "@/components/music-player/contexts/PlaylistContext"
@@ -429,12 +430,13 @@ const HomePage: React.FC = () => {
 
   const handleDeleteTrack = (trackId: string, e: React.MouseEvent) => {
     e.stopPropagation()
-    // Si la pista que se está reproduciendo es la eliminada, detener reproducción
+    if (!window.confirm("¿Eliminar esta canción de tu biblioteca y playlists?")) return
     if (audioPlayer.currentTrack?.id === trackId) {
       audioPlayer.pause()
     }
     removeTrackFromAllPlaylists(trackId)
     removeTrack(trackId)
+    toast({ title: "Canción eliminada", description: "Se eliminó de tu biblioteca y playlists." })
   }
 
   return (

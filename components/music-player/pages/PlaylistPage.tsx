@@ -4,6 +4,7 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import styled from "styled-components"
 import { Play, Trash2, ArrowLeft } from "lucide-react"
+import { toast } from "@/hooks/use-toast"
 import type { Track } from "@/components/music-player/types"
 import { usePlaylistContext, useTracksContext } from "@/components/music-player/contexts/PlaylistContext"
 import { useAudioPlayerContext } from "@/components/music-player/contexts/AudioPlayerContext"
@@ -407,15 +408,17 @@ const PlaylistPage: React.FC = () => {
 
   const handleRemoveFromPlaylist = (trackId: string, e: React.MouseEvent) => {
     e.stopPropagation()
-    if (selectedPlaylist) {
-      removeFromPlaylist(selectedPlaylist.id, trackId)
-    }
+    if (!selectedPlaylist) return
+    if (!window.confirm("¿Eliminar esta canción de la playlist?")) return
+    removeFromPlaylist(selectedPlaylist.id, trackId)
+    toast({ title: "Canción eliminada de la playlist" })
   }
 
   const handleDeletePlaylist = (playlistId: string, e: React.MouseEvent) => {
     e.stopPropagation()
     if (window.confirm("¿Estás seguro de que quieres eliminar esta playlist?")) {
       deletePlaylist(playlistId)
+      toast({ title: "Playlist eliminada" })
     }
   }
 
