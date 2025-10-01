@@ -93,6 +93,7 @@ interface PlaylistContextType {
   createPlaylist: (name: string, description: string) => void
   addToPlaylist: (playlistId: string, track: Track) => void
   removeFromPlaylist: (playlistId: string, trackId: string) => void
+  removeTrackFromAllPlaylists: (trackId: string) => void
   deletePlaylist: (playlistId: string) => void
   getPlaylist: (playlistId: string) => Playlist | undefined
 }
@@ -189,6 +190,15 @@ export const PlaylistProvider: React.FC<PlaylistProviderProps> = ({ children }) 
     setPlaylists((prev) => prev.filter((playlist) => playlist.id !== playlistId))
   }
 
+  const removeTrackFromAllPlaylists = (trackId: string) => {
+    setPlaylists((prev) =>
+      prev.map((playlist) => ({
+        ...playlist,
+        tracks: playlist.tracks.filter((track) => track.id !== trackId),
+      })),
+    )
+  }
+
   const getPlaylist = (playlistId: string) => {
     return playlists.find((playlist) => playlist.id === playlistId)
   }
@@ -198,6 +208,7 @@ export const PlaylistProvider: React.FC<PlaylistProviderProps> = ({ children }) 
     createPlaylist,
     addToPlaylist,
     removeFromPlaylist,
+    removeTrackFromAllPlaylists,
     deletePlaylist,
     getPlaylist,
   }

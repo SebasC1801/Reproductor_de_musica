@@ -3,7 +3,7 @@
 import type React from "react"
 import { useState, useEffect } from "react"
 import styled from "styled-components"
-import { Play, ChevronRight, Heart, Clock, Mic2, Plus } from "lucide-react"
+import { Play, ChevronRight, Heart, Clock, Mic2, Plus, Trash2 } from "lucide-react"
 import type { Track } from "@/components/music-player/types"
 import { useAudioPlayerContext } from "@/components/music-player/contexts/AudioPlayerContext"
 import { useTracksContext, usePlaylistContext } from "@/components/music-player/contexts/PlaylistContext"
@@ -324,8 +324,8 @@ const HomePage: React.FC = () => {
   const [isCreatePlaylistOpen, setIsCreatePlaylistOpen] = useState(false)
 
   const audioPlayer = useAudioPlayerContext()
-  const { tracks, addTracks } = useTracksContext()
-  const { createPlaylist } = usePlaylistContext()
+  const { tracks, addTracks, removeTrack } = useTracksContext()
+  const { createPlaylist, removeTrackFromAllPlaylists } = usePlaylistContext()
 
   useEffect(() => {
     const savedLikes = localStorage.getItem("likedTracks")
@@ -425,6 +425,16 @@ const HomePage: React.FC = () => {
     const mins = Math.floor(seconds / 60)
     const secs = seconds % 60
     return `${mins}:${secs.toString().padStart(2, "0")}`
+  }
+
+  const handleDeleteTrack = (trackId: string, e: React.MouseEvent) => {
+    e.stopPropagation()
+    // Si la pista que se está reproduciendo es la eliminada, detener reproducción
+    if (audioPlayer.currentTrack?.id === trackId) {
+      audioPlayer.pause()
+    }
+    removeTrackFromAllPlaylists(trackId)
+    removeTrack(trackId)
   }
 
   return (
@@ -533,6 +543,26 @@ const HomePage: React.FC = () => {
                           }}
                         >
                           <Heart size={16} fill={likedTracks.has(track.id) ? "#1DB954" : "none"} />
+                        </button>
+                        <button
+                          onClick={(e) => handleDeleteTrack(track.id, e)}
+                          title="Eliminar"
+                          style={{
+                            background: "transparent",
+                            border: "none",
+                            cursor: "pointer",
+                            marginRight: "16px",
+                            color: "#ef4444",
+                            transition: "transform 0.2s ease",
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = "scale(1.1)"
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = "scale(1)"
+                          }}
+                        >
+                          <Trash2 size={16} />
                         </button>
                         {formatDuration(track.duration)}
                       </TrackDuration>
